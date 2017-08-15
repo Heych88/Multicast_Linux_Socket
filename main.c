@@ -23,6 +23,7 @@ If the server receives -2, it exits.
 #include <unistd.h>
 #include <errno.h>
 #include <time.h>
+#include <wiringSerial.h>
 
 //#define h_addr h_addr_list[0] /* uncomment if an error for backwards compatability */
 
@@ -36,6 +37,18 @@ void error( char *msg ) {
 
 int func( int a ) {
    return 2 * a;
+}
+
+int spinMotor(double angle){
+    int fd = serialOpen ("/dev/ttyUSB0", 9400);
+    if(fd > 0){
+        error("ERROR connecting to serial");
+    }
+
+    // write stuff to the serial port
+    int command = 123;
+    serialPutchar(fd, command);
+    return 0;
 }
 
 void sendData( int sockfd, int x ) {
@@ -60,10 +73,38 @@ int getData( int sockfd ) {
     return atoi( buffer );
 }
 
-int main(int argc, char *argv[]) {
-    int sockfd, n;
+int connectServer(int argc){
+    int sockfd;
     struct sockaddr_in serv_addr;
     struct hostent *server;
+
+    if (argc < 3) {
+        // error( const_cast<char *>( "usage myClient2 hostname port\n" ) );
+        printf( "contacting %s on port %d\n", serverIp, portno );
+        // exit(0);
+    }
+    if ( ( sockfd = socket(AF_INET, SOCK_STREAM, 0) ) < 0 ){
+        error("ERROR opening socket");
+    }
+    if ( ( server = gethostbyname( serverIp ) ) == NULL ){
+        error("ERROR, no such host\n");
+    }
+
+    bzero( (char *) &serv_addr, sizeof(serv_addr));
+    serv_addr.sin_family = AF_INET;
+    bcopy( (char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, server->h_length);
+    serv_addr.sin_port = htons(portno);
+    if ( connect(sockfd,(struct sockaddr *)&serv_addr,sizeof(serv_addr)) < 0){
+        error("ERROR connecting");
+    }
+
+    return sockfd;
+}
+
+int main(int argc, char *argv[]) {
+    int sockfd, n;
+    //struct sockaddr_in serv_addr;
+    //struct hostent *server;
     char buffer[256];
     int data;
     time_t start, end;
@@ -71,33 +112,14 @@ int main(int argc, char *argv[]) {
 
     while(1){
         time(&start);
-        if (argc < 3) {
-          // error( const_cast<char *>( "usage myClient2 hostname port\n" ) );
-          printf( "contacting %s on port %d\n", serverIp, portno );
-          // exit(0);
-        }
-        if ( ( sockfd = socket(AF_INET, SOCK_STREAM, 0) ) < 0 ){
-            error("ERROR opening socket");
-        }
-        if ( ( server = gethostbyname( serverIp ) ) == NULL ){
-            error("ERROR, no such host\n");
-        }
-        printf("sockfd: %d\n", sockfd);
 
-        bzero( (char *) &serv_addr, sizeof(serv_addr));
-        serv_addr.sin_family = AF_INET;
-        bcopy( (char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, server->h_length);
-        serv_addr.sin_port = htons(portno);
-        if ( connect(sockfd,(struct sockaddr *)&serv_addr,sizeof(serv_addr)) < 0){
-            error("ERROR connecting");
-        }
-
-        for ( n = 0; n < 10; n++ ) {
-          sendData( sockfd, n );
-          data = getData( sockfd );
-          printf("%d ->  %d\n",n, data );
-        }
-        sendData( sockfd, -2 );
+        sockfd = connectServer(argc);
+        //for ( n = 0; n < 10; n++ ) {
+        //sendData( sockfd, 1 );
+        data = getData( sockfd );
+        printf("%d ->  %d\n",n, data );
+        //}
+        //sendData( sockfd, -2 );
 
         while(diff < 1.0){
             time(&end);
