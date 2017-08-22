@@ -10,6 +10,8 @@ The server waits for a connection request from a client.
 The server assumes the client will send positive integers, which it sends back multiplied by 2.
 If the server receives -1 it closes the socket with the client.
 If the server receives -2, it exits.
+
+http://www.tenouk.com/Module41c.html
 */
 
 #include <stdio.h>
@@ -22,6 +24,7 @@ If the server receives -2, it exits.
 int main(int argc, char *argv[])
 {
     struct sockaddr_in groupSock;
+    struct sockaddr_in addr;
     int sd;
     char databuf_out[MSGBUFSIZE] = "Multicast test message lol!";
     int datalen_out = sizeof(databuf_out);
@@ -35,14 +38,9 @@ int main(int argc, char *argv[])
 
     while (1){
         // Read from the socket.
-        if(read(sd, databuf_in, datalen_in) < 0) {
-            perror("Reading datagram message error");
-            close(sd);
-            exit(1);
-        } else {
-            printf("Reading datagram message...OK.\n");
-            printf("The message from multicast server is: \"%s\"\n", databuf_in);
-        }
+        int nbytes=recvfrom(sd,&databuf_in,MSGBUFSIZE,0, (struct sockaddr *) &groupSock,sizeof(groupSock));
+
+        printf("\n");
 
         if(sendto(sd, databuf_out, datalen_out, 0, (struct sockaddr*)&groupSock, sizeof(groupSock)) < 0) {
                 perror("Sending datagram message error");
