@@ -22,8 +22,6 @@ http://www.tenouk.com/Module41c.html
 #include <string.h>
 #include <stdio.h>
 
-#include "turntable.c"
-
 #define HELLO_PORT 50122
 #define HELLO_GROUP "239.0.0.1" // Multicast group IP address
 #define MSGBUFSIZE 256
