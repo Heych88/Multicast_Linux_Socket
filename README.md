@@ -8,7 +8,7 @@ Intel Edison or BeagleBone, interfacing with either Wifi or Ethernet networks.
 Clone this repository on the embedded Linux device.
 
 ```
-git clone https://github.com/Heych88/Multicast_Socket.git
+git clone https://github.com/Heych88/Multicast_Linux_Socket.git
 ```
 
 ## Run the Code
