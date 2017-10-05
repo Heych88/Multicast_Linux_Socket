@@ -22,8 +22,8 @@ sendding a string back to the network.
 #include <string.h>
 #include <stdio.h>
 
-#define PORT 50122      // Port number to listen and send data on
-#define GROUP_IP "239.0.0.1" // Multicast group IP address
+#define PORT 12345      // Port number to listen and send data on
+#define GROUP_IP "239.0.0.239" // Multicast group IP address
 #define MSGBUFSIZE 256      // size of the send and receive data buffers
 #define LOCAL_IP "169.254.17.247" // IP address that interfaces with the network, Ethernet or Wifi
 
