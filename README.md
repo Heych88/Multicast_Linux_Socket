@@ -13,6 +13,8 @@ git clone https://github.com/Heych88/Multicast_Linux_Socket.git
 
 ## Run the Code
 
+Change the Multicast and device IP address in the main.c file to the desired network addresses.
+
 Open up a terminal window, if using the Raspberry Pi, or SSH remotely using putty, for Edison and BeagleBone.
 Navigate to the cloned directories location and compile the file.
 
